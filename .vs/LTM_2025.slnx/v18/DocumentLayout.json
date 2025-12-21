@@ -1,0 +1,92 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\LTM_2025\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\LTM_2025\\chess_game_client\\src\\main\\java\\com\\chess_client\\Main.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:chess_game_client\\src\\main\\java\\com\\chess_client\\Main.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\LTM_2025\\chess_game_client\\src\\main\\java\\module-info.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:chess_game_client\\src\\main\\java\\module-info.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\LTM_2025\\chess_game_client\\pom.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:chess_game_client\\pom.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\LTM_2025\\chess_game_server\\database\\schema.sql||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:chess_game_server\\database\\schema.sql||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Main.java",
+              "DocumentMoniker": "D:\\LTM_2025\\chess_game_client\\src\\main\\java\\com\\chess_client\\Main.java",
+              "RelativeDocumentMoniker": "chess_game_client\\src\\main\\java\\com\\chess_client\\Main.java",
+              "ToolTip": "D:\\LTM_2025\\chess_game_client\\src\\main\\java\\com\\chess_client\\Main.java",
+              "RelativeToolTip": "chess_game_client\\src\\main\\java\\com\\chess_client\\Main.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAaAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAN4SURBVDhPXZJbaBxVGMf/55zZyZDsZpOti2YTs6k2YdNo0tIExAs2Boo\u002BFCIYLIESqqJ9EMVLbV\u002BU4A0vaFFQsPQmVawxgUIffIj6oBEiRNNodm00MZe2ydZkdS\u002BzuzNzzpzj2aVPfnBmODPn\u002B8/v/OYQ6Bq4KxKfPN11AsZqJ7zAL\u002BoSUtiky1gJ/sg\u002BmE1V1rDXPxuofejAXGGPsVWZV0spVQ14cSRx3zvP7bmAclOjWrCg3roCIl3dFSivlkJ7E/fHLX/42U9YiIepvfK0\u002B9TgpFpZsiu9rHKZOvvgkO9G9v\u002Bz1EXyn3egYDMUuI2Cg0DWiNx9qWegL614L3UyIdRaD9D\u002BflN2J\u002Bbx3belKoGcfeKnzFJr39j498gkM/BKFF5BwREStmIaiqpl06Uu4fCaW8Hf\u002BKgo72ibZPOzh6j6daQbTrRP/J3AZjqLO0cGce/RJyHjjbgqbHQN7yO37miixtY1yI0lYH0NKleuo7YalNg9TbFR/7ya2S3wc0jJjIHlZBLR1u24vr4BrhQ6ensQid0MaYQBqv342t0GgZr0ob7x0xQnmjx8JUtIKp3cgOwVB47jouxy0IAJwhg8T8AnFDCCOsAAlrW663rvNSpJb7v47hG8OfqDGnqF5KzL6H/sIGI72rF3\u002BFG8euEMtnd2YPHyIvT3IAnT1k1YQmNYCqhVKaJ\u002Bi/bKjJxen5F09AuB1bQCL5rwuAlVY8H2OEqKIUc1idJUdbfAHDqLfOJ2SIYBijF2Dz618pgLgutghwo4Zgkllse/xQzyvISiX4Avihqfg1OlAzW\u002BHn4NW6BDZ3InyVrzC9IO/Sm0NKFfcFm5SwgNnNMe8ozAkWVwoYOUC2FBHzTIXQu8SMevlosPL/7xtdxGfvd9gsPHXsN758bx4fkJfDzxJVxKdJMeRDvQJnwpoEwCkyoREqpdK4XeJ40Z9k09UZrF\u002BNvvw8vWI0\u002BCSIUtyIY2Tcv1Kg9ScqhwDKSBSSPki0IzdlYDIAL10XJL7EhdAsVCm7oW6V4/39kiku1mCyyfyToPpFH/ZkcCJoNsChUKQW/qrwhdqx7lmV2HjvWw\u002BMveZnwqFUhcPJx\u002BaXo1HJD5x089I4ONB/16lzBiAlkqVMAfk/MTE2rm3BwCWKkC8J3HDxwN7mutTv5X1qnMI\u002Bx0ZqvmePkkRuW2G49vFPAfq6u0agMMZMYAAAAASUVORK5CYII=",
+              "WhenOpened": "2025-12-21T04:24:12.532Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "module-info.java",
+              "DocumentMoniker": "D:\\LTM_2025\\chess_game_client\\src\\main\\java\\module-info.java",
+              "RelativeDocumentMoniker": "chess_game_client\\src\\main\\java\\module-info.java",
+              "ToolTip": "D:\\LTM_2025\\chess_game_client\\src\\main\\java\\module-info.java",
+              "RelativeToolTip": "chess_game_client\\src\\main\\java\\module-info.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAN4SURBVDhPXZJbaBxVGMf/55zZyZDsZpOti2YTs6k2YdNo0tIExAs2Boo\u002BFCIYLIESqqJ9EMVLbV\u002BU4A0vaFFQsPQmVawxgUIffIj6oBEiRNNodm00MZe2ydZkdS\u002BzuzNzzpzj2aVPfnBmODPn\u002B8/v/OYQ6Bq4KxKfPN11AsZqJ7zAL\u002BoSUtiky1gJ/sg\u002BmE1V1rDXPxuofejAXGGPsVWZV0spVQ14cSRx3zvP7bmAclOjWrCg3roCIl3dFSivlkJ7E/fHLX/42U9YiIepvfK0\u002B9TgpFpZsiu9rHKZOvvgkO9G9v\u002Bz1EXyn3egYDMUuI2Cg0DWiNx9qWegL614L3UyIdRaD9D\u002BflN2J\u002Bbx3belKoGcfeKnzFJr39j498gkM/BKFF5BwREStmIaiqpl06Uu4fCaW8Hf\u002BKgo72ibZPOzh6j6daQbTrRP/J3AZjqLO0cGce/RJyHjjbgqbHQN7yO37miixtY1yI0lYH0NKleuo7YalNg9TbFR/7ya2S3wc0jJjIHlZBLR1u24vr4BrhQ6ensQid0MaYQBqv342t0GgZr0ob7x0xQnmjx8JUtIKp3cgOwVB47jouxy0IAJwhg8T8AnFDCCOsAAlrW663rvNSpJb7v47hG8OfqDGnqF5KzL6H/sIGI72rF3\u002BFG8euEMtnd2YPHyIvT3IAnT1k1YQmNYCqhVKaJ\u002Bi/bKjJxen5F09AuB1bQCL5rwuAlVY8H2OEqKIUc1idJUdbfAHDqLfOJ2SIYBijF2Dz618pgLgutghwo4Zgkllse/xQzyvISiX4Avihqfg1OlAzW\u002BHn4NW6BDZ3InyVrzC9IO/Sm0NKFfcFm5SwgNnNMe8ozAkWVwoYOUC2FBHzTIXQu8SMevlosPL/7xtdxGfvd9gsPHXsN758bx4fkJfDzxJVxKdJMeRDvQJnwpoEwCkyoREqpdK4XeJ40Z9k09UZrF\u002BNvvw8vWI0\u002BCSIUtyIY2Tcv1Kg9ScqhwDKSBSSPki0IzdlYDIAL10XJL7EhdAsVCm7oW6V4/39kiku1mCyyfyToPpFH/ZkcCJoNsChUKQW/qrwhdqx7lmV2HjvWw\u002BMveZnwqFUhcPJx\u002BaXo1HJD5x089I4ONB/16lzBiAlkqVMAfk/MTE2rm3BwCWKkC8J3HDxwN7mutTv5X1qnMI\u002Bx0ZqvmePkkRuW2G49vFPAfq6u0agMMZMYAAAAASUVORK5CYII=",
+              "WhenOpened": "2025-12-21T04:22:45.644Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "pom.xml",
+              "DocumentMoniker": "D:\\LTM_2025\\chess_game_client\\pom.xml",
+              "RelativeDocumentMoniker": "chess_game_client\\pom.xml",
+              "ToolTip": "D:\\LTM_2025\\chess_game_client\\pom.xml",
+              "RelativeToolTip": "chess_game_client\\pom.xml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003576|",
+              "WhenOpened": "2025-12-21T04:19:24.601Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "schema.sql",
+              "DocumentMoniker": "D:\\LTM_2025\\chess_game_server\\database\\schema.sql",
+              "RelativeDocumentMoniker": "chess_game_server\\database\\schema.sql",
+              "ToolTip": "D:\\LTM_2025\\chess_game_server\\database\\schema.sql",
+              "RelativeToolTip": "chess_game_server\\database\\schema.sql",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAAAIAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-12-21T02:56:38.836Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
