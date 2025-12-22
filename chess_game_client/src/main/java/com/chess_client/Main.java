@@ -34,6 +34,7 @@ public class Main extends Application {
         // Use WindowFactory to create stages
         if (toOpen <= 1) {
             Stage s = com.chess_client.ui.WindowFactory.createLoginStage();
+            
             s.getIcons().add(new Image(getClass().getResourceAsStream("/com/chess_client/images/logo.png")));
             s.setOnCloseRequest(event -> {
                 AuthService.signOutSync();
