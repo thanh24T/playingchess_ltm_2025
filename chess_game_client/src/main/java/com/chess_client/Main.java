@@ -49,4 +49,37 @@ public class Main extends Application {
             
             // Xử lý sự kiện khi người dùng bấm nút X (đóng cửa sổ)
             s.setOnCloseRequest(event -> {
-                // Gọi API hoặc dịch vụ để đăng xuất đồng bộ (đảm bả
+                // Gọi API hoặc dịch vụ để đăng xuất đồng bộ (đảm bảo server biết user đã thoát)
+                AuthService.signOutSync();
+                // Kết thúc JavaFX thread
+                Platform.exit();
+                // Tắt hoàn toàn chương trình (Exit code 0: thành công)
+                System.exit(0);
+            });
+            s.show();
+        } 
+        // Trường hợp 2: Mở nhiều cửa sổ (Chế độ Debug/Test)
+        else {
+            for (int i = 0; i < toOpen; i++) {
+                Stage s = com.chess_client.ui.WindowFactory.createLoginStage();
+                s.getIcons().add(new Image(getClass().getResourceAsStream("/com/chess_client/images/logo.png")));
+                
+                // Chỉ gắn sự kiện đóng ứng dụng hoàn toàn vào cửa sổ cuối cùng được tạo ra
+                // (Để tránh việc đóng 1 cửa sổ phụ làm tắt cả chương trình của các cửa sổ khác)
+                if (i == toOpen - 1) {
+                    s.setOnCloseRequest(event -> {
+                        AuthService.signOutSync();
+                        Platform.exit();
+                        System.exit(0);
+                    });
+                }
+                s.show();
+            }
+        }
+    }
+
+    // Hàm main chuẩn của Java để khởi chạy ứng dụng JavaFX
+    public static void main(String[] args) {
+        launch();
+    }
+}
