@@ -25,72 +25,90 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class GameController {
 
     // ===================== UI COMPONENTS - BOARD =====================
+    
     @FXML
     private GridPane chessBoard;
 
     // ===================== UI COMPONENTS - PLAYER INFO =====================
+    
     @FXML
-    private Label opponentPlayerLabel;
+    private Label opponentPlayerLabel;  // Hiển thị màu quân đối thủ
     @FXML
-    private Label opponentNameLabel;
+    private Label opponentNameLabel;   // Hiển thị tên đối thủ
     @FXML
-    private Label playerLabel;
+    private Label playerLabel;         // Hiển thị màu quân người chơi
     @FXML
-    private Label playerNameLabel;
+    private Label playerNameLabel;     // Hiển thị tên người chơi
 
     // ===================== UI COMPONENTS - GAME INFO =====================
+    
     @FXML
-    private Label turnLabel;
+    private Label turnLabel;      // Hiển thị lượt đi hiện tại
     @FXML
-    private Label statusLabel;
+    private Label statusLabel;    // Hiển thị trạng thái game (chiếu, chiếu hết, hòa...)
     @FXML
-    private Label lastMoveLabel;
+    private Label lastMoveLabel;  // Hiển thị nước đi cuối cùng
 
     // ===================== UI COMPONENTS - BUTTONS =====================
+    
     @FXML
-    private Button drawButton;
+    private Button drawButton;    // Nút đề nghị hòa
     @FXML
-    private Button resignButton;
+    private Button resignButton;  // Nút đầu hàng
 
     // ===================== UI COMPONENTS - CHAT =====================
+    
     @FXML
-    private ScrollPane chatScrollPane;
+    private ScrollPane chatScrollPane;  // ScrollPane chứa danh sách tin nhắn
     @FXML
-    private VBox chatMessagesBox;
+    private VBox chatMessagesBox;       // VBox chứa các tin nhắn
     @FXML
-    private TextField chatInput;
+    private TextField chatInput;        // Ô nhập tin nhắn
     @FXML
-    private Button sendMessageButton;
+    private Button sendMessageButton;   // Nút gửi tin nhắn
 
-    private ChatManager chatManager;
-    private BoardView boardView;
+    // ===================== UI MANAGERS =====================
+    
+    private ChatManager chatManager;    // Quản lý chat UI và logic
+    private BoardView boardView;        // Quản lý hiển thị và tương tác bàn cờ
 
     // ===================== GAME STATE =====================
-    private Board board;
-    private GameLogic gameLogic;
-    private Piece.Color currentPlayer;
-    private Piece.Color playerColor;
-    private List<Move> moveHistory;
-    private String gameId;
-    private String opponentName;
-    private String playerName;
+    
+    private Board board;                    // Bàn cờ hiện tại
+    private GameLogic gameLogic;           // Logic nghiệp vụ cờ vua
+    private Piece.Color currentPlayer;     // Người chơi hiện tại (WHITE/BLACK)
+    private Piece.Color playerColor;       // Màu quân của người chơi này
+    private List<Move> moveHistory;        // Lịch sử các nước đi
+    
+    // Thông tin trận đấu
+    private String gameId;          // ID trận đấu từ server
+    private String opponentName;    // Tên đối thủ
+    private String playerName;      // Tên người chơi
 
-    // Handlers
-    private PeerNetworkHandler peerNetworkHandler;
-    private AIPlayer aiPlayer;
-    private GameStateChecker gameStateChecker;
-    private GameActionHandler gameActionHandler;
-    private UIGameInfoUpdater uiUpdater;
-
+    // ===================== HANDLERS & SERVICES =====================
+    
+    private PeerNetworkHandler peerNetworkHandler;  // Xử lý giao tiếp P2P với đối thủ
+    private AIPlayer aiPlayer;                      // AI player (nếu chơi với máy)
+    private GameStateChecker gameStateChecker;      // Kiểm tra trạng thái game
+    private GameActionHandler gameActionHandler;    // Xử lý các hành động game (hòa, đầu hàng)
+    private UIGameInfoUpdater uiUpdater;            // Cập nhật thông tin UI
+    
     // Service gọi API game server
     private final GameService gameService = new GameService();
 
     // ===================== INITIALIZATION =====================
+    
+    /**
+     * Khởi tạo controller khi FXML được load.
+     * Thiết lập tất cả các component, handlers và callbacks.
+     */
     @FXML
     public void initialize() {
+        // Khởi tạo game state
         moveHistory = new ArrayList<>();
         playerColor = Piece.Color.WHITE; // Mặc định người chơi là TRẮNG
         initializeGame();
@@ -104,7 +122,7 @@ public class GameController {
         chatManager = new ChatManager(chatScrollPane, chatMessagesBox, chatInput, sendMessageButton);
         chatManager.initialize();
 
-        // Khởi tạo network handler
+        // Khởi tạo network handler và thiết lập callbacks
         peerNetworkHandler = new PeerNetworkHandler();
         setupNetworkCallbacks();
 
@@ -127,6 +145,7 @@ public class GameController {
         gameActionHandler = new GameActionHandler(statusLabel, chatManager, peerNetworkHandler,
                 playerColor, this::endGame, () -> disableGameButtons(false));
 
+        // Thiết lập event handlers cho các nút
         setupEventHandlers();
 
         // Reset UI về trạng thái ban đầu
@@ -137,8 +156,15 @@ public class GameController {
         }
     }
 
+    // ===================== GAME SETUP =====================
+    
     /**
-     * Được gọi từ HomeController sau khi ghép trận để set gameId và tên đối thủ.
+     * Được gọi từ HomeController sau khi ghép trận thành công.
+     * Thiết lập thông tin trận đấu và cập nhật UI.
+     * 
+     * @param gameId       ID trận đấu từ server
+     * @param opponentName Tên đối thủ
+     * @param playerName   Tên người chơi
      */
     public void setGameInfo(String gameId, String opponentName, String playerName) {
         this.gameId = gameId;
@@ -150,14 +176,17 @@ public class GameController {
     }
 
     /**
-     * Thiết lập chế độ chơi với máy.
+     * Thiết lập chế độ chơi với máy (AI).
+     * Vô hiệu hóa các tính năng không cần thiết như cầu hòa và chat.
      *
-     * @param difficulty 1 = dễ, 2 = trung bình, 3 = khó
-     * @param humanColor màu quân của người chơi (thường là TRẮNG)
+     * @param difficulty  Độ khó AI: 1 = dễ, 2 = trung bình, 3 = khó
+     * @param humanColor  Màu quân của người chơi (thường là WHITE)
      */
     public void setupVsComputer(int difficulty, Piece.Color humanColor) {
         this.playerColor = humanColor;
-        Piece.Color computerColor = (humanColor == Piece.Color.WHITE) ? Piece.Color.BLACK : Piece.Color.WHITE;
+        Piece.Color computerColor = (humanColor == Piece.Color.WHITE) 
+            ? Piece.Color.BLACK 
+            : Piece.Color.WHITE;
         this.aiPlayer = new AIPlayer(board, gameLogic, computerColor, difficulty);
 
         // Chơi với máy thì không cho cầu hòa
@@ -175,7 +204,7 @@ public class GameController {
             sendMessageButton.setDisable(true);
         }
 
-        // Cập nhật lại UI
+        // Cập nhật lại UI với thông tin AI
         if (uiUpdater != null) {
             uiUpdater.setPlayerColor(playerColor);
             uiUpdater.setAiPlayer(aiPlayer);
@@ -190,7 +219,9 @@ public class GameController {
     }
 
     /**
-     * Được gọi từ HomeController sau khi ghép trận để set màu quân (WHITE/BLACK).
+     * Được gọi từ HomeController sau khi ghép trận để thiết lập màu quân.
+     * 
+     * @param color Màu quân của người chơi (WHITE/BLACK)
      */
     public void setPlayerColor(Piece.Color color) {
         this.playerColor = color;
@@ -205,7 +236,10 @@ public class GameController {
     }
 
     /**
-     * Socket P2P đã được thiết lập giữa hai client (LAN).
+     * Thiết lập socket P2P đã được kết nối giữa hai client (LAN).
+     * Được gọi sau khi PeerService thiết lập kết nối thành công.
+     * 
+     * @param socket Socket P2P đã kết nối
      */
     public void setPeerSocket(Socket socket) {
         if (peerNetworkHandler != null) {
@@ -213,19 +247,25 @@ public class GameController {
         }
     }
 
+    // ===================== NETWORK SETUP =====================
+    
     /**
      * Thiết lập các callbacks cho network handler.
+     * Xử lý các sự kiện: nhận nước đi, nhận tin nhắn chat, nhận game action.
      */
     private void setupNetworkCallbacks() {
+        // Callback khi nhận nước đi từ đối thủ
         peerNetworkHandler.setOnMoveReceived((fromRow, fromCol, toRow, toCol) -> {
             Piece piece = board.getPiece(fromRow, fromCol);
-            if (piece == null)
+            if (piece == null) {
                 return;
+            }
 
             Move move = new Move(fromRow, fromCol, toRow, toCol, piece);
-            executeMove(move, true); // true = từ network
+            executeMove(move, true); // true = từ network (không gửi lại)
         });
 
+        // Callback khi nhận tin nhắn chat từ đối thủ
         peerNetworkHandler.setOnChatReceived(message -> {
             if (chatManager != null) {
                 chatManager.addChatMessage(
@@ -235,6 +275,7 @@ public class GameController {
             }
         });
 
+        // Callback khi nhận game action từ đối thủ (hòa, đầu hàng...)
         peerNetworkHandler.setOnGameActionReceived(action -> {
             if (gameActionHandler != null) {
                 gameActionHandler.handleGameAction(action);
@@ -242,46 +283,70 @@ public class GameController {
         });
     }
 
+    // ===================== EVENT HANDLERS =====================
+    
+    /**
+     * Thiết lập event handlers cho các nút điều khiển.
+     */
     private void setupEventHandlers() {
         drawButton.setOnAction(e -> offerDraw());
         resignButton.setOnAction(e -> resign());
     }
 
+    // ===================== GAME INITIALIZATION =====================
+    
+    /**
+     * Khởi tạo game mới: tạo bàn cờ, logic, và reset trạng thái.
+     */
     private void initializeGame() {
         board = new Board();
         gameLogic = new GameLogic(board);
-        currentPlayer = Piece.Color.WHITE;
+        currentPlayer = Piece.Color.WHITE; // Trắng đi trước
         moveHistory.clear();
     }
 
+    // ===================== MOVE EXECUTION =====================
+    
+    /**
+     * Thực hiện một nước đi (public method, được gọi từ BoardView).
+     * 
+     * @param move Nước đi cần thực hiện
+     */
     private void executeMove(Move move) {
         executeMove(move, false);
     }
 
     /**
-     * @param fromNetwork true nếu nước đi đến từ socket P2P (không gửi lại tránh
-     *                    vòng lặp)
+     * Thực hiện một nước đi và cập nhật game state.
+     * 
+     * @param move        Nước đi cần thực hiện
+     * @param fromNetwork true nếu nước đi đến từ socket P2P (không gửi lại để tránh vòng lặp)
      */
     private void executeMove(Move move, boolean fromNetwork) {
+        // Thực hiện nước đi trên bàn cờ
         board.movePiece(move);
         moveHistory.add(move);
 
+        // Gửi nước đi đến đối thủ qua P2P (nếu không phải từ network)
         if (!fromNetwork && peerNetworkHandler != null) {
             peerNetworkHandler.sendMove(move);
         }
 
-        currentPlayer = currentPlayer == Piece.Color.WHITE ? Piece.Color.BLACK : Piece.Color.WHITE;
+        // Đổi lượt chơi
+        currentPlayer = currentPlayer == Piece.Color.WHITE 
+            ? Piece.Color.BLACK 
+            : Piece.Color.WHITE;
 
-        // Cập nhật UI nước đi
+        // Cập nhật UI nước đi cuối cùng
         if (uiUpdater != null) {
             uiUpdater.updateLastMoveLabel(move);
         }
 
-        // Kiểm tra trạng thái game
+        // Kiểm tra trạng thái game (chiếu, chiếu hết, hòa...)
         GameStateChecker.GameStateResult stateResult = gameStateChecker.checkGameState(currentPlayer);
         handleGameStateResult(stateResult);
 
-        // Cập nhật UI
+        // Cập nhật UI lượt đi và bàn cờ
         if (uiUpdater != null) {
             uiUpdater.updateTurnLabel(currentPlayer);
         }
@@ -291,53 +356,74 @@ public class GameController {
             boardView.refreshBoard();
         }
 
-        // Nếu đang chơi với máy và đến lượt AI -> AI tự động đi sau một khoảng trễ nhỏ
+        // Nếu đang chơi với máy và đến lượt AI -> AI tự động đi sau một khoảng trễ
         if (aiPlayer != null && currentPlayer == aiPlayer.getAiColor()) {
             new Thread(() -> {
                 try {
-                    Thread.sleep(600); // delay ~0.6s cho tự nhiên
+                    Thread.sleep(600); // Delay ~0.6s cho tự nhiên
                 } catch (InterruptedException ignored) {
+                    // Ignore
                 }
                 Platform.runLater(this::makeComputerMove);
             }).start();
         }
     }
 
+    /**
+     * Xử lý kết quả kiểm tra trạng thái game.
+     * 
+     * @param result Kết quả kiểm tra trạng thái
+     */
     private void handleGameStateResult(GameStateChecker.GameStateResult result) {
+        // Cập nhật label trạng thái
         if (uiUpdater != null) {
             uiUpdater.updateStatusLabel(gameStateChecker.getStatusText(result));
         }
 
+        // Nếu game vẫn tiếp tục (NORMAL hoặc CHECK)
         if (result.getState() == GameStateChecker.GameStateResult.State.NORMAL ||
                 result.getState() == GameStateChecker.GameStateResult.State.CHECK) {
-            return; // Game tiếp tục
+            return;
         }
 
-        // Game kết thúc
+        // Game kết thúc: vô hiệu hóa các nút và kết thúc game
         disableGameButtons(false);
         endGame(result.getWinner());
     }
 
     // ===================== GAME ACTIONS =====================
+    
+    /**
+     * Xử lý đề nghị hòa từ người chơi.
+     */
     private void offerDraw() {
         if (gameActionHandler != null) {
             gameActionHandler.offerDraw();
         }
     }
 
+    /**
+     * Xử lý đầu hàng từ người chơi.
+     */
     private void resign() {
         if (gameActionHandler != null) {
             gameActionHandler.resign();
         }
     }
 
+    /**
+     * Kết thúc game và hiển thị kết quả.
+     * 
+     * @param winner Người thắng (null nếu hòa)
+     */
     private void endGame(Piece.Color winner) {
+        // Vô hiệu hóa tương tác với bàn cờ
         if (boardView != null) {
             boardView.setCurrentPlayer(null);
             boardView.refreshBoard();
         }
 
-        // Gọi API để cập nhật game và ranking (qua GameService)
+        // Gọi API để cập nhật game và ranking trên server
         new Thread(() -> gameService.endGame(gameId, winner)).start();
 
         // Hiển thị dialog thông báo kết thúc
@@ -362,6 +448,9 @@ public class GameController {
         });
     }
 
+    /**
+     * Quay về màn hình Home.
+     */
     private void returnToHome() {
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
@@ -376,20 +465,32 @@ public class GameController {
         }
     }
 
+    /**
+     * Vô hiệu hóa hoặc kích hoạt các nút điều khiển game.
+     * 
+     * @param enable true để enable, false để disable
+     */
     private void disableGameButtons(boolean enable) {
         drawButton.setDisable(!enable);
         resignButton.setDisable(!enable);
     }
 
     // ===================== COMPUTER PLAYER =====================
+    
+    /**
+     * AI player thực hiện nước đi.
+     * Được gọi tự động khi đến lượt AI.
+     */
     private void makeComputerMove() {
-        if (aiPlayer == null)
+        if (aiPlayer == null) {
             return;
+        }
 
         try {
             Move chosen = aiPlayer.makeMove();
+            
+            // Nếu không còn nước đi hợp lệ -> kiểm tra chiếu hết / hòa
             if (chosen == null) {
-                // Không còn nước đi hợp lệ -> kiểm tra chiếu hết / hòa
                 Piece.Color aiColor = aiPlayer.getAiColor();
                 GameStateChecker.GameStateResult result = gameStateChecker.checkGameState(aiColor);
                 if (result.getState() != GameStateChecker.GameStateResult.State.NORMAL &&
@@ -399,6 +500,7 @@ public class GameController {
                 return;
             }
 
+            // Thực hiện nước đi của AI
             executeMove(chosen, false);
         } catch (Exception e) {
             e.printStackTrace();

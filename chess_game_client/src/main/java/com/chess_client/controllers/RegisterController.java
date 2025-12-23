@@ -29,7 +29,7 @@ public class RegisterController {
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        // === Validate input ===
+     
         if (fullName.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Vui lòng nhập đầy đủ thông tin!");
             return;
