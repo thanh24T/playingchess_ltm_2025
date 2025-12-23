@@ -38,6 +38,9 @@ public class HomeController {
 
     @FXML
     private VBox btnExit;
+    
+    @FXML
+    private VBox btnLocal;
 
     @FXML
     private Label lblWelcome;
@@ -235,5 +238,24 @@ public class HomeController {
         AuthService.signOutSync();
         Platform.exit();
         System.exit(0);
+    }
+    
+    @FXML
+    private void handleLocalGame() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/chess_client/fxml/local-game.fxml"));
+            Parent root = loader.load();
+            LocalGameController controller = loader.getController();
+            
+            Stage stage = (Stage) btnLocal.getScene().getWindow();
+            controller.setStage(stage);
+            
+            Scene scene = new Scene(root, 1200, 800);
+            stage.setScene(scene);
+            stage.setResizable(false);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showAlert("Lỗi", "Không thể mở màn hình chơi local: " + ex.getMessage());
+        }
     }
 }

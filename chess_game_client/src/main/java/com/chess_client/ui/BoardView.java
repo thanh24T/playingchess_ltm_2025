@@ -43,6 +43,7 @@ public class BoardView {
     private static final Color SELECTED_COLOR = Color.web("#baca44");
     private static final Color VALID_MOVE_COLOR = Color.web("#769656", 0.7);
 
+    // Constructor cho online game
     public BoardView(GridPane chessBoard,
             Board board,
             GameLogic gameLogic,
@@ -53,6 +54,112 @@ public class BoardView {
         this.gameLogic = gameLogic;
         this.playerColor = playerColor;
         this.onMoveConfirmed = onMoveConfirmed;
+    }
+    
+    // Constructor đơn giản cho local game (không cần GameLogic và callback)
+    private boolean isRotated = false;
+    private Consumer<int[]> onSquareClickedSimple;
+    
+    public BoardView(Board board, javafx.scene.layout.Pane parentPane) {
+        this.board = board;
+        this.chessBoard = new GridPane();
+        this.gameLogic = null;
+        this.playerColor = Piece.Color.WHITE;
+        this.onMoveConfirmed = null;
+        
+        parentPane.getChildren().add(chessBoard);
+        chessBoard.setLayoutX(50);
+        chessBoard.setLayoutY(50);
+    }
+    
+    public void setOnSquareClicked(Consumer<int[]> callback) {
+        this.onSquareClickedSimple = callback;
+    }
+    
+    public void setRotated(boolean rotated) {
+        this.isRotated = rotated;
+    }
+    
+    public void render() {
+        if (gameLogic == null) {
+            // Simple render for local game
+            renderSimple();
+        } else {
+            // Original render for online game
+            drawBoard();
+        }
+    }
+    
+    private void renderSimple() {
+        chessBoard.getChildren().clear();
+        
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                StackPane square = createSimpleSquare(row, col);
+                chessBoard.add(square, col, row);
+            }
+        }
+    }
+    
+    private StackPane createSimpleSquare(int row, int col) {
+        StackPane square = new StackPane();
+        square.setPrefSize(SQUARE_SIZE, SQUARE_SIZE);
+        square.setUserData(new int[] { row, col });
+        
+        // Background
+        Rectangle background = new Rectangle(SQUARE_SIZE, SQUARE_SIZE);
+        Color baseColor = (row + col) % 2 == 0 ? LIGHT_SQUARE : DARK_SQUARE;
+        
+        // Highlight selected square
+        if (row == selectedRow && col == selectedCol) {
+            background.setFill(SELECTED_COLOR);
+        } else {
+            background.setFill(baseColor);
+        }
+        
+        square.getChildren().add(background);
+        
+        // Piece
+        Piece piece = board.getPiece(row, col);
+        if (piece != null) {
+            Text pieceText = new Text(piece.getUnicode());
+            pieceText.setFont(Font.font(50));
+            pieceText.setFill(Color.BLACK);
+            
+            // Rotate piece text if board is rotated
+            if (isRotated) {
+                pieceText.setRotate(180);
+            }
+            
+            square.getChildren().add(pieceText);
+        }
+        
+        // Click handler
+        final int r = row, c = col;
+        square.setOnMouseClicked(e -> {
+            if (onSquareClickedSimple != null) {
+                onSquareClickedSimple.accept(new int[]{r, c});
+            }
+        });
+        
+        return square;
+    }
+    
+    public void setSelectedSquare(int row, int col) {
+        this.selectedRow = row;
+        this.selectedCol = col;
+    }
+    
+    public int getSelectedRow() {
+        return selectedRow;
+    }
+    
+    public int getSelectedCol() {
+        return selectedCol;
+    }
+    
+    public GridPane getChessBoard() {
+        return chessBoard;
     }
 
     public void setPlayerColor(Piece.Color playerColor) {

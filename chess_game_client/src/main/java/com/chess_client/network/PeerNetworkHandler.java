@@ -28,6 +28,7 @@ public class PeerNetworkHandler {
     private OnMoveReceived onMoveReceived;           // Callback khi nhận nước đi
     private OnChatReceived onChatReceived;           // Callback khi nhận tin nhắn chat
     private OnGameActionReceived onGameActionReceived; // Callback khi nhận game action
+    private OnFileReceived onFileReceived;           // Callback khi nhận file
 
     /**
      * Callback interface khi nhận được nước đi từ đối thủ.
@@ -50,6 +51,13 @@ public class PeerNetworkHandler {
      */
     public interface OnGameActionReceived {
         void onGameAction(String action);
+    }
+
+    /**
+     * Callback interface khi nhận được file từ đối thủ.
+     */
+    public interface OnFileReceived {
+        void onFile(String filename, long fileSize, byte[] fileData);
     }
 
     // ===================== CONSTRUCTOR =====================
@@ -103,6 +111,13 @@ public class PeerNetworkHandler {
      */
     public void setOnGameActionReceived(OnGameActionReceived callback) {
         this.onGameActionReceived = callback;
+    }
+
+    /**
+     * Thiết lập callback khi nhận file từ đối thủ.
+     */
+    public void setOnFileReceived(OnFileReceived callback) {
+        this.onFileReceived = callback;
     }
 
     // ===================== SEND METHODS =====================
@@ -182,6 +197,32 @@ public class PeerNetworkHandler {
         }
     }
 
+    /**
+     * Gửi file đến đối thủ qua P2P socket.
+     * Format JSON: {"type": "file", "filename": "...", "fileSize": 123, "fileData": "base64..."}
+     * 
+     * @param filename Tên file
+     * @param fileData Dữ liệu file dạng byte array
+     */
+    public void sendFile(String filename, byte[] fileData) {
+        if (peerOut == null) {
+            return;
+        }
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put("type", "file");
+            json.put("filename", filename);
+            json.put("fileSize", fileData.length);
+            // Encode file data thành Base64 để gửi qua JSON
+            json.put("fileData", java.util.Base64.getEncoder().encodeToString(fileData));
+            peerOut.println(json.toString());
+            peerOut.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // ===================== RECEIVE METHODS =====================
     
     /**
@@ -207,6 +248,7 @@ public class PeerNetworkHandler {
                         case "move" -> handleReceivedMove(json);
                         case "chat" -> handleReceivedChat(json);
                         case "game_action" -> handleReceivedGameAction(json);
+                        case "file" -> handleReceivedFile(json);
                     }
                 } catch (Exception parseEx) {
                     // Bỏ qua tin nhắn không hợp lệ
@@ -265,6 +307,25 @@ public class PeerNetworkHandler {
 
         String action = json.getString("action");
         Platform.runLater(() -> onGameActionReceived.onGameAction(action));
+    }
+
+    /**
+     * Xử lý file nhận được từ đối thủ.
+     * Decode Base64 và gọi callback trên JavaFX Application Thread.
+     */
+    private void handleReceivedFile(JSONObject json) {
+        if (onFileReceived == null) {
+            return;
+        }
+
+        String filename = json.getString("filename");
+        long fileSize = json.getLong("fileSize");
+        String fileDataBase64 = json.getString("fileData");
+        
+        // Decode Base64 thành byte array
+        byte[] fileData = java.util.Base64.getDecoder().decode(fileDataBase64);
+        
+        Platform.runLater(() -> onFileReceived.onFile(filename, fileSize, fileData));
     }
 
     // ===================== CLEANUP =====================

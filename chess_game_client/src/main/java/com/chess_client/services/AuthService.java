@@ -15,16 +15,29 @@ public class AuthService {
             body.put("username", username);
             body.put("password", password);
 
-            HttpClient client = HttpClient.newHttpClient();
+            String url = BASE_URL + "/signin";
+            System.out.println("=== SIGNIN REQUEST ===");
+            System.out.println("URL: " + url);
+            System.out.println("Body: " + body.toString());
+            System.out.println("======================");
+
+            HttpClient client = HttpClient.newBuilder()
+                    .version(HttpClient.Version.HTTP_1_1)
+                    .build();
+            
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/signin"))
+                    .uri(URI.create(url))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
+            System.out.println("=== SIGNIN RESPONSE ===");
             System.out.println("Status: " + response.statusCode());
+            System.out.println("Headers: " + response.headers().map());
+            System.out.println("Body: " + response.body());
+            System.out.println("======================");
 
             // chỉ parse nếu là JSON thật
             String bodyText = response.body().trim();

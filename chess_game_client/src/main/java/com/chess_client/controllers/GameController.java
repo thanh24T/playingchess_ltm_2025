@@ -70,6 +70,8 @@ public class GameController {
     private TextField chatInput;        // Ô nhập tin nhắn
     @FXML
     private Button sendMessageButton;   // Nút gửi tin nhắn
+    @FXML
+    private Button sendFileButton;      // Nút gửi file
 
     // ===================== UI MANAGERS =====================
     
@@ -119,7 +121,7 @@ public class GameController {
         boardView.refreshBoard();
 
         // Khởi tạo quản lý chat
-        chatManager = new ChatManager(chatScrollPane, chatMessagesBox, chatInput, sendMessageButton);
+        chatManager = new ChatManager(chatScrollPane, chatMessagesBox, chatInput, sendMessageButton, sendFileButton);
         chatManager.initialize();
 
         // Khởi tạo network handler và thiết lập callbacks
@@ -132,6 +134,9 @@ public class GameController {
                 peerNetworkHandler.sendChatMessage(message);
             }
         });
+
+        // Kết nối callback gửi file qua network
+        chatManager.setOnSendFile(this::handleSendFile);
 
         // Khởi tạo game state checker
         gameStateChecker = new GameStateChecker(board, gameLogic);
@@ -203,6 +208,9 @@ public class GameController {
         if (sendMessageButton != null) {
             sendMessageButton.setDisable(true);
         }
+        if (sendFileButton != null) {
+            sendFileButton.setDisable(true);
+        }
 
         // Cập nhật lại UI với thông tin AI
         if (uiUpdater != null) {
@@ -251,7 +259,7 @@ public class GameController {
     
     /**
      * Thiết lập các callbacks cho network handler.
-     * Xử lý các sự kiện: nhận nước đi, nhận tin nhắn chat, nhận game action.
+     * Xử lý các sự kiện: nhận nước đi, nhận tin nhắn chat, nhận game action, nhận file.
      */
     private void setupNetworkCallbacks() {
         // Callback khi nhận nước đi từ đối thủ
@@ -279,6 +287,20 @@ public class GameController {
         peerNetworkHandler.setOnGameActionReceived(action -> {
             if (gameActionHandler != null) {
                 gameActionHandler.handleGameAction(action);
+            }
+        });
+
+        // Callback khi nhận file từ đối thủ
+        peerNetworkHandler.setOnFileReceived((filename, fileSize, fileData) -> {
+            if (chatManager != null) {
+                // Hiển thị file trong chat với nút tải xuống (truyền fileData để hiển thị ảnh)
+                chatManager.addFileMessage(
+                        opponentName != null ? opponentName : "Đối thủ",
+                        filename,
+                        fileSize,
+                        false,
+                        () -> handleDownloadFile(filename, fileData),
+                        fileData);
             }
         });
     }
@@ -504,6 +526,125 @@ public class GameController {
             executeMove(chosen, false);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    // ===================== FILE TRANSFER =====================
+
+    /**
+     * Xử lý gửi file từ người chơi.
+     * Mở FileChooser để chọn file, đọc file và gửi qua P2P.
+     */
+    private void handleSendFile() {
+        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+        fileChooser.setTitle("Chọn file để gửi");
+        
+        // Giới hạn kích thước file (10MB)
+        fileChooser.setInitialDirectory(new java.io.File(System.getProperty("user.home")));
+        
+        java.io.File selectedFile = fileChooser.showOpenDialog(chatInput.getScene().getWindow());
+        
+        if (selectedFile != null) {
+            // Kiểm tra kích thước file (giới hạn 10MB)
+            long fileSize = selectedFile.length();
+            if (fileSize > 10 * 1024 * 1024) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("File quá lớn");
+                alert.setHeaderText(null);
+                alert.setContentText("File không được vượt quá 10MB!");
+                alert.showAndWait();
+                return;
+            }
+            
+            // Đọc file và gửi qua network
+            new Thread(() -> {
+                try {
+                    byte[] fileData = java.nio.file.Files.readAllBytes(selectedFile.toPath());
+                    String filename = selectedFile.getName();
+                    
+                    // Gửi file qua P2P
+                    if (peerNetworkHandler != null) {
+                        peerNetworkHandler.sendFile(filename, fileData);
+                    }
+                    
+                    // Hiển thị file đã gửi trong chat (truyền fileData để hiển thị ảnh)
+                    final byte[] finalFileData = fileData;
+                    Platform.runLater(() -> {
+                        if (chatManager != null) {
+                            chatManager.addFileMessage(
+                                playerName != null ? playerName : "Bạn",
+                                filename,
+                                fileSize,
+                                true,
+                                null,
+                                finalFileData);
+                        }
+                    });
+                    
+                } catch (java.io.IOException e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Lỗi");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Không thể đọc file: " + e.getMessage());
+                        alert.showAndWait();
+                    });
+                }
+            }).start();
+        }
+    }
+
+    /**
+     * Xử lý tải xuống file nhận được từ đối thủ.
+     * Mở DirectoryChooser để chọn thư mục lưu file.
+     * 
+     * @param filename Tên file
+     * @param fileData Dữ liệu file
+     */
+    private void handleDownloadFile(String filename, byte[] fileData) {
+        javafx.stage.DirectoryChooser dirChooser = new javafx.stage.DirectoryChooser();
+        dirChooser.setTitle("Chọn thư mục lưu file");
+        dirChooser.setInitialDirectory(new java.io.File(System.getProperty("user.home")));
+        
+        java.io.File selectedDir = dirChooser.showDialog(chatInput.getScene().getWindow());
+        
+        if (selectedDir != null) {
+            new Thread(() -> {
+                try {
+                    java.io.File outputFile = new java.io.File(selectedDir, filename);
+                    
+                    // Nếu file đã tồn tại, thêm số vào tên file
+                    int counter = 1;
+                    while (outputFile.exists()) {
+                        String nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
+                        String ext = filename.substring(filename.lastIndexOf('.'));
+                        outputFile = new java.io.File(selectedDir, nameWithoutExt + "_" + counter + ext);
+                        counter++;
+                    }
+                    
+                    // Ghi file
+                    java.nio.file.Files.write(outputFile.toPath(), fileData);
+                    
+                    // Thông báo thành công
+                    final java.io.File finalOutputFile = outputFile;
+                    Platform.runLater(() -> {
+                        if (chatManager != null) {
+                            chatManager.addSystemMessage("Đã lưu file: " + finalOutputFile.getAbsolutePath());
+                        }
+                    });
+                    
+                } catch (java.io.IOException e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Lỗi");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Không thể lưu file: " + e.getMessage());
+                        alert.showAndWait();
+                    });
+                }
+            }).start();
         }
     }
 }

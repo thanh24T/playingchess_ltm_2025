@@ -18,13 +18,24 @@ public class ProfileService {
             throw new IllegalStateException("Chưa đăng nhập");
         }
 
+        String url = BASE_URL + "/me";
+        System.out.println("=== GET PROFILE REQUEST ===");
+        System.out.println("URL: " + url);
+        System.out.println("Token: " + token.substring(0, Math.min(20, token.length())) + "...");
+        System.out.println("===========================");
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/me"))
+                .uri(URI.create(url))
                 .header("Authorization", "Bearer " + token)
                 .GET()
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println("=== GET PROFILE RESPONSE ===");
+        System.out.println("Status: " + response.statusCode());
+        System.out.println("Body: " + response.body());
+        System.out.println("============================");
 
         if (response.statusCode() == 200) {
             return new JSONObject(response.body());

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.chess_client.controllers.LocalGameController"
+    style="-fx-background-color: #2c3e50;">
+
+    <!-- TOP: Header -->
+    <top>
+        <HBox alignment="CENTER" spacing="20" style="-fx-background-color: #34495e; -fx-padding: 15;">
+            <Label text="CHẾ ĐỘ 2 NGƯỜI CHƠI" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+        </HBox>
+    </top>
+
+    <!-- CENTER: Game Board -->
+    <center>
+        <HBox alignment="CENTER" spacing="30" style="-fx-padding: 20;">
+            
+            <!-- LEFT: Player Info & Controls -->
+            <VBox spacing="15" alignment="TOP_CENTER" prefWidth="250">
+                
+                <!-- White Player Info -->
+                <VBox fx:id="whitePlayerBox" spacing="5" alignment="CENTER"
+                    style="-fx-background-color: #ecf0f1; -fx-padding: 15; -fx-background-radius: 10;">
+                    <Label fx:id="whitePlayerLabel" text="⚪ Quân Trắng" 
+                        style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+                </VBox>
+                
+                <!-- Turn Indicator -->
+                <VBox spacing="10" alignment="CENTER"
+                    style="-fx-background-color: #34495e; -fx-padding: 15; -fx-background-radius: 10;">
+                    <Label fx:id="turnLabel" text="Lượt: Trắng" 
+                        style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                    <Label fx:id="statusLabel" text="" 
+                        style="-fx-text-fill: #e74c3c; -fx-font-size: 14px; -fx-font-weight: bold;" />
+                </VBox>
+                
+                <!-- Black Player Info -->
+                <VBox fx:id="blackPlayerBox" spacing="5" alignment="CENTER"
+                    style="-fx-background-color: #34495e; -fx-padding: 15; -fx-background-radius: 10;">
+                    <Label fx:id="blackPlayerLabel" text="⚫ Quân Đen" 
+                        style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                </VBox>
+                
+                <Separator />
+                
+                <!-- Last Move -->
+                <VBox spacing="5" alignment="CENTER"
+                    style="-fx-background-color: #34495e; -fx-padding: 10; -fx-background-radius: 10;">
+                    <Label text="Nước đi cuối:" style="-fx-text-fill: #bdc3c7; -fx-font-size: 12px;" />
+                    <Label fx:id="lastMoveLabel" text="---" 
+                        style="-fx-text-fill: white; -fx-font-size: 14px;" />
+                </VBox>
+                
+                <!-- Control Buttons -->
+                <VBox spacing="10">
+                    <Button fx:id="undoButton" text="↶ Hoàn tác" maxWidth="Infinity"
+                        style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 14px; 
+                               -fx-padding: 10; -fx-background-radius: 5; -fx-cursor: hand;" />
+                    
+                    <Button fx:id="newGameButton" text="🔄 Ván mới" maxWidth="Infinity"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 14px; 
+                               -fx-padding: 10; -fx-background-radius: 5; -fx-cursor: hand;" />
+                    
+                    <Button fx:id="exitButton" text="🏠 Trang chủ" maxWidth="Infinity"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; 
+                               -fx-padding: 10; -fx-background-radius: 5; -fx-cursor: hand;" />
+                </VBox>
+                
+            </VBox>
+
+            <!-- CENTER: Chess Board -->
+            <Pane fx:id="boardPane" prefWidth="640" prefHeight="640"
+                style="-fx-background-color: #34495e; -fx-background-radius: 10;">
+            </Pane>
+
+            <!-- RIGHT: Move History -->
+            <VBox spacing="10" prefWidth="250">
+                <Label text="LỊCH SỬ NƯỚC ĐI" 
+                    style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                
+                <ScrollPane fitToWidth="true" prefHeight="550"
+                    style="-fx-background: #34495e; -fx-background-color: #34495e;">
+                    <VBox fx:id="moveHistoryBox" spacing="5" 
+                        style="-fx-background-color: #34495e; -fx-padding: 10;">
+                    </VBox>
+                </ScrollPane>
+            </VBox>
+
+        </HBox>
+    </center>
+
+    <!-- BOTTOM: Info -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: #34495e; -fx-padding: 10;">
+            <Label text="💡 Bàn cờ sẽ tự động xoay sau mỗi lượt để người chơi tiếp theo có góc nhìn thuận lợi" 
+                style="-fx-text-fill: #bdc3c7; -fx-font-size: 12px; -fx-font-style: italic;" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

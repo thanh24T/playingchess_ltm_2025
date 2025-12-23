@@ -22,8 +22,10 @@ public class ChatManager {
     private final VBox chatMessagesBox;       // VBox chứa các tin nhắn
     private final TextField chatInput;        // Ô nhập tin nhắn
     private final Button sendMessageButton;   // Nút gửi tin nhắn
+    private final Button sendFileButton;      // Nút gửi file
     
     private java.util.function.Consumer<String> onSendMessage; // Callback để gửi tin nhắn qua network
+    private Runnable onSendFile;              // Callback để gửi file
 
     // ===================== CONSTRUCTOR =====================
     
@@ -34,15 +36,18 @@ public class ChatManager {
      * @param chatMessagesBox  VBox chứa các tin nhắn
      * @param chatInput        TextField để nhập tin nhắn
      * @param sendMessageButton Button để gửi tin nhắn
+     * @param sendFileButton   Button để gửi file
      */
     public ChatManager(ScrollPane chatScrollPane,
             VBox chatMessagesBox,
             TextField chatInput,
-            Button sendMessageButton) {
+            Button sendMessageButton,
+            Button sendFileButton) {
         this.chatScrollPane = chatScrollPane;
         this.chatMessagesBox = chatMessagesBox;
         this.chatInput = chatInput;
         this.sendMessageButton = sendMessageButton;
+        this.sendFileButton = sendFileButton;
     }
 
     // ===================== INITIALIZATION =====================
@@ -58,6 +63,16 @@ public class ChatManager {
     }
 
     /**
+     * Thiết lập callback để gửi file qua network.
+     * Callback này sẽ được gọi khi người chơi chọn file để gửi.
+     * 
+     * @param onSendFile Callback để xử lý gửi file
+     */
+    public void setOnSendFile(Runnable onSendFile) {
+        this.onSendFile = onSendFile;
+    }
+
+    /**
      * Khởi tạo ChatManager: thiết lập event handlers.
      */
     public void initialize() {
@@ -66,10 +81,11 @@ public class ChatManager {
     }
 
     /**
-     * Thiết lập event handler cho nút gửi tin nhắn.
+     * Thiết lập event handler cho nút gửi tin nhắn và gửi file.
      */
     private void setupEventHandlers() {
         sendMessageButton.setOnAction(e -> sendMessage());
+        sendFileButton.setOnAction(e -> sendFile());
     }
 
     /**
@@ -100,6 +116,16 @@ public class ChatManager {
             if (onSendMessage != null) {
                 onSendMessage.accept(message);
             }
+        }
+    }
+
+    /**
+     * Xử lý gửi file từ người chơi.
+     * Gọi callback để mở FileChooser và gửi file qua network.
+     */
+    public void sendFile() {
+        if (onSendFile != null) {
+            onSendFile.run();
         }
     }
 
@@ -158,5 +184,121 @@ public class ChatManager {
         
         // Tự động scroll xuống tin nhắn mới nhất
         Platform.runLater(() -> chatScrollPane.setVvalue(1.0));
+    }
+
+    /**
+     * Thêm thông báo file vào chat box.
+     * Hiển thị tên file và kích thước, với nút tải xuống nếu là file nhận được.
+     * Nếu là file ảnh, hiển thị preview ảnh.
+     * 
+     * @param sender     Tên người gửi
+     * @param filename   Tên file
+     * @param fileSize   Kích thước file (bytes)
+     * @param isPlayer   true nếu là file của người chơi này gửi
+     * @param onDownload Callback khi bấm nút tải xuống (null nếu là file đã gửi)
+     * @param fileData   Dữ liệu file (để hiển thị ảnh preview)
+     */
+    public void addFileMessage(String sender, String filename, long fileSize, boolean isPlayer, Runnable onDownload, byte[] fileData) {
+        // Tạo HBox chứa tin nhắn file
+        HBox messageBox = new HBox(5);
+        messageBox.setAlignment(isPlayer ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+        // Tạo bubble chat với màu khác nhau
+        VBox bubble = new VBox(5);
+        String bgColor = isPlayer ? "#4a9eff" : "#4a4541";
+        bubble.setStyle("-fx-background-color: " + bgColor + ";" +
+                "-fx-background-radius: 8; -fx-padding: 8 12 8 12;");
+
+        // Label hiển thị tên người gửi
+        Label senderLabel = new Label(sender);
+        senderLabel.setStyle("-fx-text-fill: #f0d9b5; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        bubble.getChildren().add(senderLabel);
+
+        // Kiểm tra xem có phải file ảnh không
+        if (isImageFile(filename) && fileData != null) {
+            try {
+                // Tạo ImageView để hiển thị ảnh
+                javafx.scene.image.Image image = new javafx.scene.image.Image(
+                    new java.io.ByteArrayInputStream(fileData)
+                );
+                javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView(image);
+                
+                // Giới hạn kích thước ảnh
+                imageView.setFitWidth(200);
+                imageView.setPreserveRatio(true);
+                imageView.setSmooth(true);
+                
+                // Thêm border cho ảnh
+                imageView.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 2);");
+                
+                bubble.getChildren().add(imageView);
+                
+                // Label tên file (nhỏ hơn)
+                Label fileNameLabel = new Label("📷 " + filename);
+                fileNameLabel.setStyle("-fx-text-fill: white; -fx-font-size: 10px;");
+                bubble.getChildren().add(fileNameLabel);
+                
+            } catch (Exception e) {
+                // Nếu không load được ảnh, hiển thị như file thông thường
+                addFileIconAndName(bubble, filename);
+            }
+        } else {
+            // File không phải ảnh, hiển thị icon file
+            addFileIconAndName(bubble, filename);
+        }
+
+        // Kích thước file
+        String sizeStr = formatFileSize(fileSize);
+        Label sizeLabel = new Label(sizeStr);
+        sizeLabel.setStyle("-fx-text-fill: #ddd; -fx-font-size: 10px;");
+        bubble.getChildren().add(sizeLabel);
+
+        // Nếu là file nhận được, thêm nút tải xuống
+        if (!isPlayer && onDownload != null) {
+            Button downloadBtn = new Button("Tải xuống");
+            downloadBtn.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; " +
+                    "-fx-font-size: 10px; -fx-padding: 4 8 4 8; -fx-background-radius: 3; -fx-cursor: hand;");
+            downloadBtn.setOnAction(e -> onDownload.run());
+            bubble.getChildren().add(downloadBtn);
+        }
+
+        messageBox.getChildren().add(bubble);
+        chatMessagesBox.getChildren().add(messageBox);
+
+        // Tự động scroll xuống
+        Platform.runLater(() -> chatScrollPane.setVvalue(1.0));
+    }
+
+    /**
+     * Thêm icon và tên file vào bubble (cho file không phải ảnh).
+     */
+    private void addFileIconAndName(VBox bubble, String filename) {
+        Label fileIcon = new Label("📄 " + filename);
+        fileIcon.setStyle("-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;");
+        bubble.getChildren().add(fileIcon);
+    }
+
+    /**
+     * Kiểm tra xem file có phải là ảnh không dựa trên extension.
+     */
+    private boolean isImageFile(String filename) {
+        String lowerName = filename.toLowerCase();
+        return lowerName.endsWith(".jpg") || 
+               lowerName.endsWith(".jpeg") || 
+               lowerName.endsWith(".png") || 
+               lowerName.endsWith(".gif") || 
+               lowerName.endsWith(".bmp") ||
+               lowerName.endsWith(".webp");
+    }
+
+    /**
+     * Format kích thước file thành chuỗi dễ đọc (KB, MB, GB).
+     */
+    private String formatFileSize(long bytes) {
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return String.format("%.1f KB", bytes / 1024.0);
+        if (bytes < 1024 * 1024 * 1024) return String.format("%.1f MB", bytes / (1024.0 * 1024));
+        return String.format("%.1f GB", bytes / (1024.0 * 1024 * 1024));
     }
 }

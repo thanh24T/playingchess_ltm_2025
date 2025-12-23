@@ -101,6 +101,9 @@
 
                     <!-- Ô nhập tin nhắn -->
                     <HBox spacing="5">
+                        <Button fx:id="sendFileButton"
+                            style="-fx-background-color: #2ecc71; -fx-text-fill: white;                                        -fx-font-size: 12px; -fx-padding: 8 12 8 12;                                        -fx-background-radius: 3; -fx-cursor: hand;"
+                            text="📎" />
                         <TextField fx:id="chatInput" promptText="Nhập tin nhắn..."
                             style="-fx-background-color: #1a1714; -fx-text-fill: white;                                           -fx-prompt-text-fill: #666; -fx-border-color: #0d0c0b;                                           -fx-border-width: 1; -fx-padding: 8; -fx-background-radius: 3;"
                             HBox.hgrow="ALWAYS" />
