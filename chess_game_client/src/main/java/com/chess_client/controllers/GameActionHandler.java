@@ -9,13 +9,11 @@ import javafx.scene.control.Label;
 
 import java.util.function.Consumer;
 
-/**
- * Xử lý các game actions: đề nghị hòa, đầu hàng, và các actions từ network.
- * Quản lý dialog xác nhận, gửi/nhận actions qua P2P, và cập nhật UI.
- */
+
+ 
 public class GameActionHandler {
 
-    // ===================== FIELDS =====================
+    
     
     private final Label statusLabel;              // Label hiển thị trạng thái game
     private final ChatManager chatManager;        // Quản lý chat để hiển thị thông báo
@@ -24,8 +22,7 @@ public class GameActionHandler {
     private final Consumer<Piece.Color> onGameEnd; // Callback khi game kết thúc
     private final Runnable disableButtons;        // Callback để vô hiệu hóa các nút
 
-    // ===================== CONSTRUCTOR =====================
-    
+   
     /**
      * Tạo GameActionHandler với các dependencies.
      * 
