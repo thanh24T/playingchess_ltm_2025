@@ -1,4 +1,4 @@
--- Database schema for chess server
+
 
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
