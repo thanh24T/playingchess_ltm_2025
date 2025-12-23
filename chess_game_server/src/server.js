@@ -17,6 +17,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, "..", ".env") });
 
 const app = express();
+
 const PORT = process.env.PORT || 3000;
 
 // Debug: show which DB user/host are being used (don't print password in logs)
